@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -23,6 +24,7 @@ public class Posts {
 	private String postdesc;
 	private int postlikescnt;
 	
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="uid")
 	private Users user;
@@ -64,7 +66,7 @@ public class Posts {
 		// TODO Auto-generated constructor stub
 	}
 
-    @JsonBackReference
+   // @JsonBackReference
 	public Users getUser() {
 		return user;
 	}
@@ -79,7 +81,7 @@ public class Posts {
 				+ user  +"]";
 	}
 
-	@JsonManagedReference
+	//@JsonManagedReference
 	public List<PostComments> getPostcmnts() {
 		return postcmnts;
 	}

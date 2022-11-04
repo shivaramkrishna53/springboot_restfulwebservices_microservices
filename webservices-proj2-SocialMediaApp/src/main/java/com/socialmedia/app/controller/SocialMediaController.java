@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.text.DateFormatter;
@@ -42,16 +43,24 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.socialmedia.app.dto.DemoDto;
+import com.socialmedia.app.dtos.FullName;
+import com.socialmedia.app.dtos.Person;
+import com.socialmedia.app.dtos.PersonSplit;
 import com.socialmedia.app.dtos.PostComments;
 import com.socialmedia.app.dtos.Posts;
 import com.socialmedia.app.dtos.ResultDtoQuerySample;
 import com.socialmedia.app.dtos.ResultDtoSample;
 import com.socialmedia.app.dtos.Users;
 import com.socialmedia.app.exceptionhandler.UserNotFoundException;
+import com.socialmedia.app.repo.JpaDemo;
+import com.socialmedia.app.repo.PersonRepo;
 import com.socialmedia.app.service.SocialMediaService;
 
 @RestController
 public class SocialMediaController {
+	
+	@Autowired
+	private PersonRepo repo;
 	
 	@Autowired
 	SocialMediaService ser;
@@ -59,14 +68,20 @@ public class SocialMediaController {
 	@Autowired
 	MessageSource messagesource;
 	
+	@Autowired
+	JpaDemo jpademo;
+	
 	@PostMapping("/user/save")
 	public ResponseEntity<Object> saveUser(@RequestBody @Valid Users user)
 	{
-		Users saveduser=ser.saveuser(user);
+		Users saveduser=jpademo.saveUser(user);
+		//Users saveduser=ser.saveuser(user);
+		//int res=repo.insertAUser(user);
 		//    /user/save/{id} 101
-		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saveduser.getUid()).toUri();
-	    
-		return ResponseEntity.status(HttpStatus.OK).body(saveduser);
+//		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saveduser.getUid()).toUri();
+//	    
+	return ResponseEntity.status(HttpStatus.OK).body(saveduser);
+		//return res>0? ResponseEntity.status(HttpStatus.OK).body(res):ResponseEntity.status(HttpStatus.OK).body(res);
 	}
 	
 	@PostMapping("/users/save/bulk")
@@ -107,7 +122,11 @@ public class SocialMediaController {
 	public Users findByUserId(@PathVariable String id) throws Exception
 	{
 		
-		Users user=ser.findByUserId(Integer.parseInt(id));
+		//Users user=ser.findByUserId(Integer.parseInt(id));
+		
+		//Users user=repo.getAllUsers(Integer.parseInt(id));
+		
+		Users user=jpademo.findUserById(Integer.parseInt(id));
 		
 		System.out.println(user);
 		if(user!=null)
@@ -290,6 +309,92 @@ public class SocialMediaController {
 		FilterProvider filters=new SimpleFilterProvider().addFilter("somefilter", filter);
 		mappingjacksonval.setFilters(filters);
 		return mappingjacksonval;
+	}
+	
+	//versioning
+	
+	@GetMapping("/getperson/v1")
+	public Person getPersonBasedOnVersion1UsingUri()
+	{
+		return new Person("shiva ram krishna durgi");
+	}
+	
+	@GetMapping("/getperson/v2")
+	public List<PersonSplit> getPersonBasedOnVersion2UsingUri()
+	{
+		return Arrays.asList(new PersonSplit(new FullName("Sai", "Ram Krishna", "Durgi")),new PersonSplit(new FullName("Shiva", "Ram Krishna", "Durgi")));
+	}
+	
+	
+	@GetMapping(path = "/getperson",params = "version=1")
+	public Person getPersonBasedOnVersion1UsingRequestParam()
+	{
+		return new Person("shiva ram krishna durgi");
+	}
+	
+	@GetMapping(path="/getperson",params = "version=2")
+	public PersonSplit getPersonBasedOnVersion2UsingRequestParams()
+	{
+		return new PersonSplit(new FullName("Shiva", "Ram Krishna", "Durgi"));
+	}
+	
+	
+	@GetMapping(path="/getperson",headers ="version=1")
+	public Person getPersonBasedOnVersion1UsingHeaders()
+	{
+		return new Person("shiva ram krishna durgi");
+	}
+	
+	@GetMapping(path="/getperson",headers = "version=2")
+	public PersonSplit getPersonBasedOnVersion2UsingHeaders()
+	{
+		return new PersonSplit(new FullName("Shiva", "Ram Krishna", "Durgi"));
+	}
+	
+	@GetMapping(path="/getperson",produces = "application/vnd.api+v1+json")
+	public Person getPersonBasedOnVersion1UsingAcceptHeaderV1()
+	{
+		return new Person("shiva ram krishna durgi");
+	}
+	
+	@GetMapping(path = "/getperson", produces = "application/vnd.api+v2+json")
+	public PersonSplit getPersonBasedOnVersion2UsingAcceptHeaderV2()
+	{
+		return new PersonSplit(new FullName("Shiva", "Ram Krishna", "Durgi"));
+	}
+	
+	@GetMapping(path = "/getpersonusinghateos")
+	public EntityModel<PersonSplit> getLinkForFullNameOfAPersonUsingHateosConcept()
+	{
+		//Here we use the EntityModel class in which we can store the bean along with the link.
+		EntityModel<PersonSplit> entitymodel=EntityModel.of(new PersonSplit(new FullName("Shiva", "Ram Krishna", "Durgi")));
+		//in order to provide the link for a method of the mvc controller method we can use the webmvclinkbuilder class
+		WebMvcLinkBuilder link=WebMvcLinkBuilder.linkTo(methodOn(this.getClass()).getPersonBasedOnVersion1UsingUri());
+		entitymodel.add(link.withRel("Link to version1 of person"));
+		return entitymodel;
+		
+	}
+	
+	@GetMapping("/getpersondetailsdynamicfilteringforremovingmiddlename")
+	public MappingJacksonValue getpersondetailsusingdynamicfiltering()
+	{
+		PersonSplit person=new PersonSplit(new FullName("shiva","ramkrishna","durgi"));
+	    MappingJacksonValue mapper=new MappingJacksonValue(person);
+	    SimpleBeanPropertyFilter filter=SimpleBeanPropertyFilter.filterOutAllExcept("firstname","lastname");
+		FilterProvider filters=new SimpleFilterProvider().addFilter("simplefilter",filter);
+		mapper.setFilters(filters);
+		return mapper;
+	}
+	
+	@GetMapping("/getpersondetailsdynamicfilteringforremovinglastname")
+	public MappingJacksonValue getpersondetailsusingdynamicfiltering2()
+	{
+		PersonSplit person=new PersonSplit(new FullName("shiva","ram krishna","durgi"));
+		MappingJacksonValue mapper=new MappingJacksonValue(person);
+		SimpleBeanPropertyFilter filter=SimpleBeanPropertyFilter.filterOutAllExcept("firstname","middlename");
+		FilterProvider filters=new SimpleFilterProvider().addFilter("simplefilter",filter);
+		mapper.setFilters(filters);
+		return mapper;
 	}
 	
 	

@@ -35,7 +35,7 @@ public class ProjectRelatedExceptionHandler extends ResponseEntityExceptionHandl
 	public ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		GenericExceptionHandler gc=new GenericExceptionHandler("ValidationFailedDueToWrongParameters", new Date(),ex.getBindingResult().toString());
+		GenericExceptionHandler gc=new GenericExceptionHandler("ValidationFailedDueToWrongParameters", new Date(),ex.getFieldError().getDefaultMessage());  //ex.getMessage() //getBindingResult().toString());
 		ResponseEntity res=new ResponseEntity(gc,HttpStatus.BAD_REQUEST);
 		return res;
 	}

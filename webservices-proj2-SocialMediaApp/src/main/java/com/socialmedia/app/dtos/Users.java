@@ -30,7 +30,7 @@ public class Users {
 	private Integer uid;
 	@Size(min = 3,message = "Lenght cannot be less than 3")
 	private String uname;
-	@NotNull
+	@NotNull(message = "email address is mandatory please enter it")
 	private String uemailid;
 	@JsonIgnore
 	private String upass;
@@ -79,7 +79,7 @@ public class Users {
 				+ ustatus + "]";
 	}
 	
-	@JsonManagedReference
+	//@JsonManagedReference
 	public List<Posts> getPosts() {
 		return posts;
 	}

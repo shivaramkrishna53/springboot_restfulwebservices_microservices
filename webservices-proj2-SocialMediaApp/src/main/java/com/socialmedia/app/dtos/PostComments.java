@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class PostComments {
@@ -22,6 +23,7 @@ public class PostComments {
 	private boolean ispostactive;
 	private Date posteddate;
 	
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="postid")
 	private Posts post;
@@ -58,7 +60,7 @@ public class PostComments {
 		this.posteddate = posteddate;
 	}
 
-	@JsonBackReference
+	//@JsonBackReference
 	public Posts getPost() {
 		return post;
 	}

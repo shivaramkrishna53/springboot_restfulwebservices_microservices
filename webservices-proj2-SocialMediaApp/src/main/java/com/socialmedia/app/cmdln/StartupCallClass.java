@@ -2,7 +2,9 @@ package com.socialmedia.app.cmdln;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -27,6 +29,10 @@ public class StartupCallClass implements CommandLineRunner{
 	@Autowired
 	Social_Media_Post_Comments_Repo crepo;
 	
+	public static void justprint(int x)
+	{
+		System.out.println(x);
+	}
 	
 	Scanner sc=new Scanner(System.in);
 	@Override
@@ -71,19 +77,52 @@ public class StartupCallClass implements CommandLineRunner{
 		System.out.println(p.toString());
 	   p.getPostcmnts().forEach(System.out::println);
 	   
-	   System.out.println("-----2");
-	   System.out.println("Enter the email id: to view ur posts and comments");	
-	   String emailid=sc.next();
-	   System.out.println("Enter the search key for the commments u want to search with:");
-	   String cmnt=sc.next();
+		/*
+		 * System.out.println("-----2");
+		 * System.out.println("Enter the email id: to view ur posts and comments");
+		 * String emailid=sc.next(); System.out.
+		 * println("Enter the search key for the commments u want to search with:");
+		 * String cmnt=sc.next();
+		 * 
+		 * PostComments pscmnt=crepo.findByEmailandUserCondition(emailid,cmnt);
+		 * System.out.println(pscmnt);
+		 */
 	   
-	   PostComments pscmnt=crepo.findByEmailandUserCondition(emailid,cmnt);
-	   System.out.println(pscmnt);
-	   
-	   	
 	   
 	   
 		System.out.println("end of run");
+		
+		
+		
+		List<Integer> lst=Arrays.asList(13,27,2,11,5,1,4,19,16);
+		
+		// iterate using enhanced for loop
+//		for(int x: lst)
+//		{
+//			System.out.println(x);
+//		}
+		
+		// streams is used to convert the collection to stream of no's
+		
+		lst.stream().filter(t-> t%2==0).forEach(StartupCallClass::justprint);
+		
+		List<String> lststr=Arrays.asList("shiva","sai","roopesh","varu");
+		
+		lststr.stream().forEach(x->System.out.println(x+" :: "+x.length()));
+		
+		
+		
+		
+	String	queryToExecute = "SELECT M.MIPF_BEZ,M.KUNDENNUMMER,COUNT(*) "
+				+ "FROM AUFGABE A INNER JOIN MAV_VORGANG M ON A.ID=M.FK_AUFGABE "
+				+ "WHERE A.STATUS='OFFEN' "
+				+ "AND A.TYP='MAV_ZfA'";
+		String groupByClause = " GROUP BY M.MIPF_BEZ, M.KUNDENNUMMER ";
+		
+		
+		
+		System.out.println(queryToExecute+groupByClause);
+		
 //		List<Posts> plst=Arrays.asList(p1);
 //		u1.setPosts(plst);
 //		u1=urepo.save(u1);
