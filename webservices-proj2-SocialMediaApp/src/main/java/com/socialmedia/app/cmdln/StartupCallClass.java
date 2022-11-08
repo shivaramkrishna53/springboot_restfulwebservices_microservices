@@ -68,14 +68,14 @@ public class StartupCallClass implements CommandLineRunner{
 		pc2.setPost(p1);
 		crepo.save(pc2);
 		
-		Users u=urepo.findByUnameAndUemailid("shiva", "shiva.gmail.com");
+		Users u=urepo.findByUnameAndUemailid("dpl", "dpl@gmail.com");
 		System.out.println(u.toString());
 		
 		System.out.println("-------1");
 		
-		Posts p=prepo.findByConditon(u.getUname(),"playing cricket");
-		System.out.println(p.toString());
-	   p.getPostcmnts().forEach(System.out::println);
+//		Posts p=prepo.findByConditon(u.getUname(),"playing cricket");
+//		System.out.println(p.toString());
+//	   p.getPostcmnts().forEach(System.out::println);
 	   
 		/*
 		 * System.out.println("-----2");
