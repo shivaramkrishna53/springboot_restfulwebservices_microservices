@@ -1,0 +1,1 @@
+insert into CURRENCY_EXCHANGE values (1,75,'DEV','USD','INR');
